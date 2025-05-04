@@ -2,6 +2,7 @@ package com.docment.fetch.service;
 
 import com.docment.fetch.entity.Document;
 import com.docment.fetch.repo.DocumentRepository;
+import jakarta.persistence.criteria.Predicate;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.tika.Tika;
@@ -17,7 +18,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Service
 public class DocumentServiceImpl {
@@ -120,10 +123,20 @@ public class DocumentServiceImpl {
     }
 
 
-    public List<Document> filterByMetadata(String author, String type) {
-        return repository.findAll().stream()
-                .filter(d -> (author == null || d.getAuthor().equalsIgnoreCase(author)) &&
-                             (type == null || d.getType().equalsIgnoreCase(type)))
-                .toList();
+    // Using Specifications
+    // Using Specifications
+    public Page<Document> filterByMetadata(String author, String type, Pageable pageable) {
+        return repository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (author != null) {
+                predicates.add(cb.equal(cb.lower(root.get("author")), author.toLowerCase()));
+            }
+            if (type != null) {
+                predicates.add(cb.equal(cb.lower(root.get("type")), type.toLowerCase()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
     }
 }
