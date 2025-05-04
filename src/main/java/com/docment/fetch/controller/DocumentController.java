@@ -4,6 +4,10 @@ import com.docment.fetch.entity.Document;
 import com.docment.fetch.service.DocumentServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,8 +34,19 @@ public class DocumentController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Document>> searchByKeyword(@RequestParam String keyword) {
-        return ResponseEntity.ok(documentService.searchByKeyword(keyword));
+    public ResponseEntity<Page<Document>> searchByKeyword(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        Pageable pageable = PageRequest.of(page, size,
+                direction.equalsIgnoreCase("asc")
+                        ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending());
+
+        return ResponseEntity.ok(documentService.searchByKeyword(keyword, pageable));
     }
 
     @GetMapping("/filter")

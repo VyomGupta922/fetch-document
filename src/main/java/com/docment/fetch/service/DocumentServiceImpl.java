@@ -7,6 +7,8 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
@@ -113,8 +115,8 @@ public class DocumentServiceImpl {
         return !trimmed.isEmpty() && trimmed.length() > 20; // At least 20 non-whitespace chars
     }
 
-    public List<Document> searchByKeyword(String keyword) {
-        return repository.findByContentContainingIgnoreCase(keyword);
+    public Page<Document> searchByKeyword(String keyword, Pageable pageable) {
+        return repository.findByContentContainingIgnoreCase(keyword, pageable);
     }
 
 

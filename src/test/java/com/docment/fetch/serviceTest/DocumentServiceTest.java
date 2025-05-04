@@ -8,6 +8,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,13 +51,15 @@ public class DocumentServiceTest {
     @Test
     public void testSearchDocuments() {
         String keyword = "test";
-        List<Document> mockList = List.of(new Document());
+        Page<Document> mockPage = new PageImpl<>(List.of(new Document()));
 
-        when(documentRepository.findByContentContainingIgnoreCase(keyword)).thenReturn(mockList);
+        when(documentRepository.findByContentContainingIgnoreCase(keyword, Pageable.unpaged()))
+                .thenReturn(mockPage);
 
-        List<Document> result = documentService.searchByKeyword(keyword);
+        Page<Document> result = documentService.searchByKeyword(keyword, Pageable.unpaged());
 
-        assertEquals(1, result.size());
-        verify(documentRepository, times(1)).findByContentContainingIgnoreCase(keyword);
+        assertEquals(1, result.getTotalElements());
+        verify(documentRepository, times(1))
+                .findByContentContainingIgnoreCase(keyword, Pageable.unpaged());
     }
 }
