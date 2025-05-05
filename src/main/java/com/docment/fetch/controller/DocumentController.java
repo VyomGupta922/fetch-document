@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ public class DocumentController {
     private DocumentServiceImpl documentService;
 
     @PostMapping("/upload")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     public ResponseEntity<Document> uploadDocument(
             @RequestParam("title") String title,
             @RequestParam("author") String author,
@@ -35,6 +37,7 @@ public class DocumentController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'VIEWER')")
     public ResponseEntity<Page<Document>> searchByKeyword(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
@@ -51,6 +54,7 @@ public class DocumentController {
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'VIEWER')")
     public ResponseEntity<Page<Document>> filterDocuments(
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String type,
