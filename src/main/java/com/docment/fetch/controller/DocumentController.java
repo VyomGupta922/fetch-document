@@ -26,7 +26,7 @@ public class DocumentController {
     private DocumentServiceImpl documentService;
 
     @PostMapping("/upload")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR')")
     public ResponseEntity<Document> uploadDocument(
             @RequestParam("title") String title,
             @RequestParam("author") String author,
@@ -37,7 +37,7 @@ public class DocumentController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_VIEWER')")
     public ResponseEntity<Page<Document>> searchByKeyword(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
@@ -54,7 +54,7 @@ public class DocumentController {
     }
 
     @GetMapping("/filter")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_VIEWER')")
     public ResponseEntity<Page<Document>> filterDocuments(
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String type,

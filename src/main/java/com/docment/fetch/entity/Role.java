@@ -1,7 +1,7 @@
 package com.docment.fetch.entity;
 
 public enum Role {
-    ADMIN,
-    EDITOR,
-    VIEWER
+    ROLE_ADMIN,
+    ROLE_EDITOR,
+    ROLE_VIEWER
 }

@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,9 +36,14 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Username already exists");
         }
 
-        Set<Role> roles = request.getRoles().stream()
-                .map(r -> Role.valueOf(r.toUpperCase()))
-                .collect(Collectors.toSet());
+        Set<Role> roles = new HashSet<>();
+        for (String r : request.getRoles()) {
+            try {
+                roles.add(Role.valueOf(r.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body("Invalid role: " + r);
+            }
+        }
 
         User user = User.builder()
                 .username(request.getUsername())
@@ -49,6 +55,7 @@ public class AuthController {
         userRepo.save(user);
         return ResponseEntity.ok("User registered successfully");
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
@@ -64,7 +71,7 @@ public class AuthController {
                 .withUsername(user.getUsername())
                 .password(user.getPassword())
                 .authorities(user.getRoles().stream()
-                        .map(role -> role.name()) // or role.toString() depending on your enum
+                        .map(role ->  "ROLE_" +role.name()) // or role.toString() depending on your enum
                         .toArray(String[]::new))
                 .build();
 
